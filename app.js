@@ -18,11 +18,10 @@ const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
 const bookingController = require('./controllers/bookingController');
+const viewRouter = require('./routes/viewRoutes');
 
 // Start express app
 const app = express();
-
-// app.enable('trust proxy');
 
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
@@ -39,6 +38,9 @@ app.use(cors());
 app.options('*', cors());
 // app.options('/api/v1/tours/:id', cors());
 
+// Serving static files
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Set security HTTP headers
 app.use(helmet());
 
@@ -51,7 +53,7 @@ if (process.env.NODE_ENV === 'development') {
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
-  message: 'Too many requests from this IP, please try again in an hour!',
+  message: 'Too many requests from this IP, please try again in an hour!'
 });
 app.use('/api', limiter);
 
@@ -82,8 +84,8 @@ app.use(
       'ratingsAverage',
       'maxGroupSize',
       'difficulty',
-      'price',
-    ],
+      'price'
+    ]
   })
 );
 
@@ -97,6 +99,7 @@ app.use((req, res, next) => {
 });
 
 // 3) ROUTES
+app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
